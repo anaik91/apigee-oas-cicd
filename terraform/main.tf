@@ -1,23 +1,3 @@
-variable "apigee_mgmt_api" {
-  default = "https://apigee.googleapis.com/v1"
-}
-
-variable "apigee_org" {
-  default = "apigee-payg-377208"
-}
-
-variable "apigee_env" {
-  default = "dev"
-}
-
-variable "proxy_name" {
-  default = "proxy1"
-}
-
-variable "proxy_bundle_path" {
-  default = "api"
-}
-
 data "google_client_config" "default" {
 }
 

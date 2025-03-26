@@ -6,6 +6,12 @@ on:
       - main
   workflow_dispatch: # Allow manual triggering of the workflow
 
+
+env:
+  APIGEE_ENV: dev
+  APIGEE_PROXY_NAME: oasapi1
+  APIGEE_PROXY_BASEPATH: /oasapi1
+
 jobs:
   prepare-bundle:
     runs-on: ubuntu-latest
@@ -43,11 +49,25 @@ jobs:
           export PATH=$PATH:$HOME/.apigeecli/bin 
           python3 scripts/prepare_bundle.py \
             --apigee_org ${{ secrets.APIGEE_ORG }} \
-            --api_name newapi \
-            --api_base_path /newapi \
+            --api_name "$APIGEE_PROXY_NAME" \
+            --api_base_path "$APIGEE_PROXY_BASEPATH" \
             --oas_file_location . \
             --oas_file_name httpbin.yaml
       
-      - name: list files
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Run terraform
         run: |
-          ls -l 
+          cd terraform
+          terraform init
+          terraform plan \
+            -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
+            -var "apigee_env=$APIGEE_ENV" \
+            -var "proxy_name=$APIGEE_PROXY_NAME" \
+            -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME"
+          terraform apply \
+            -auto-approve \
+            -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
+            -var "apigee_env=$APIGEE_ENV" \
+            -var "proxy_name=$APIGEE_PROXY_NAME" \
+            -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME"
