@@ -522,9 +522,9 @@ def main():
             )
 
             api1.validate_proxy(api_name, f"{api_name}.zip")
-            sys.exit(1)
         else:
             logging.error("Bundle creation failed, cannot unzip.")
+            sys.exit(1)
     else:
         logging.error("Bundle creation failed.")
         sys.exit(1)

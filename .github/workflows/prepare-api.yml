@@ -47,3 +47,7 @@ jobs:
             --api_base_path /newapi \
             --oas_file_location . \
             --oas_file_name httpbin.yaml
+      
+      - name: list files
+        run: |
+          ls -l 
