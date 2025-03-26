@@ -1,0 +1,54 @@
+# Python
+*.pyc
+*.pyd
+__pycache__/
+*.egg-info/
+dist/
+build/
+wheels/
+.venv/
+venv/
+env/
+Enthought_project/
+*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+/terraform.tfvars
+/override.tf
+/override.tf.json
+*_override.tf
+*_override.tf.json
+.DS_Store
+
+# Credentials/Secrets (IMPORTANT: NEVER commit these!)
+*.key
+*.pem
+*_credentials.json
+*_secrets.json
+*_access_token.json
+*.pass
+/passwords.txt
+/secrets.txt
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE Specific (Adjust as needed)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Other temporary files
+*.tmp
+tmp/

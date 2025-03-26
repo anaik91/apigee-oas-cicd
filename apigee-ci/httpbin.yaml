@@ -1,0 +1,970 @@
+openapi: 3.0.1
+info:
+  title: user-manager APIs
+  version: 1.31.8-COMPASS-8190-SNAPSHOT
+servers:
+- description: Generated server url
+  url: http://localhost
+paths:
+  /manager/groups:
+    get:
+      operationId: getUsersGroups
+      parameters:
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroupDTO"
+          description: User group page
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 608 - user does not have enough privileges to make this call.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get user groups
+      tags:
+      - public
+      - User Manager
+  /manager/groups/logged-user:
+    get:
+      operationId: getUsersGroupsForLoggedUser
+      parameters:
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroupDTO"
+          description: User groups for the provided user
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get the requesting user's user groups
+      tags:
+      - public
+      - User Manager
+  /manager/membership-token:
+    get:
+      operationId: getMembershipToken
+      parameters:
+      - in: header
+        name: authorization
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: external-organization-id
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserTokenDTO"
+          description: User with provided id
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get membership access token for a specific user. This token is obtained
+        for the user´s current organization
+      tags:
+      - public
+      - User Manager
+  /manager/user-by-email:
+    get:
+      operationId: getUserByEmailAndOrganizationID
+      parameters:
+      - in: header
+        name: external-organization-type
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: email
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: externalOrganizationId
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SSOUserDTO"
+          description: User with provided email
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+            * 606 - user customer association does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get user by email.
+      tags:
+      - public
+      - User Manager
+  /manager/user-groups:
+    get:
+      operationId: getUsersPrivileges
+      parameters:
+      - in: query
+        name: pageIndex
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - in: query
+        name: pageSize
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10000
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageUserPrivilegeDTO"
+          description: User privilege page
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get user privileges
+      tags:
+      - public
+      - User Manager
+  /manager/user-groups/logged-user:
+    get:
+      operationId: getUsersPrivilegesForLoggedUser
+      parameters:
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserPrivilegeDTO"
+          description: User privileges for the provided user
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get the requesting user's user privileges
+      tags:
+      - public
+      - User Manager
+  /manager/users:
+    get:
+      operationId: getUsers
+      parameters:
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          minimum: 1
+      - in: query
+        name: pageSize
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 15
+          maximum: 1000
+          minimum: 1
+      - in: query
+        name: userStatus
+        required: false
+        schema:
+          type: string
+          enum:
+          - IN_OPERATION
+      - in: query
+        name: incidentQueueId
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDTO"
+          description: Users page
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get users
+      tags:
+      - public
+      - User Manager
+  /manager/users-by-email:
+    get:
+      operationId: getUsersByEmail
+      parameters:
+      - in: header
+        name: external-organization-type
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: email
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDTO"
+          description: Users with provided email
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get user by email
+      tags:
+      - public
+      - User Manager
+  /manager/users/invite-to-customer:
+    post:
+      operationId: inviteUser
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserDTO"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+          description: User has been associated to the customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Invite a user to an existing customer
+      tags:
+      - public
+      - User Manager
+  /manager/users/validate-current-customer:
+    get:
+      operationId: validateUserCurrentCustomer
+      parameters:
+      - in: header
+        name: external-organization-type
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: boolean
+          description: True if user has current customer associated
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Validate if user has current customer associated
+      tags:
+      - public
+      - User Manager
+  /manager/users/{userId}:
+    delete:
+      operationId: deleteUserById
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: User has been deleted
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Delete user by ID
+      tags:
+      - public
+      - User Manager
+    get:
+      operationId: getUserById
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+          description: User with provided id
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get user by ID returns userDTO with information for the organization
+        the user is currently logged in
+      tags:
+      - public
+      - User Manager
+    put:
+      operationId: updateUser
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDTO"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: 'User has been successfully updated '
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Update user details
+      tags:
+      - public
+      - User Manager
+  /manager/users/{userId}/customers:
+    get:
+      operationId: getUserCustomers
+      parameters:
+      - in: header
+        name: external-organization-type
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCustomerDTO"
+          description: customers for the provided user
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: Get all customers for a given user
+      tags:
+      - public
+      - User Manager
+  /manager/users/{userId}/switch-organization:
+    put:
+      operationId: switchUserOrganization
+      parameters:
+      - in: header
+        name: external-organization-type
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SwitchCustomerRequestDTO"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+          description: user organization was updated successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 100 - there are invalid input values.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 601 - user does not exist.
+            * 603 - customer does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |
+            _errorCode_ values:
+            * 0 - generic error while processing request
+      summary: switch user organization
+      tags:
+      - public
+      - User Manager
+components:
+  schemas:
+    CustomerDTO:
+      type: object
+      properties:
+        externalOrganizationId:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+    ErrorMessageDTO:
+      type: object
+      properties:
+        documentation:
+          type: string
+        errorCode:
+          type: integer
+          format: int32
+        errorDetails:
+          type: array
+          items:
+            type: string
+        errorMessage:
+          type: string
+    InviteUserDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+          maxLength: 64
+          minLength: 0
+        lastName:
+          type: string
+          maxLength: 64
+          minLength: 0
+        userGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserPrivilegeDTO"
+      required:
+      - email
+      - firstName
+      - lastName
+      - userGroups
+    PageUserPrivilegeDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserPrivilegeDTO"
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        size:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
+    SSOUserDTO:
+      type: object
+      properties:
+        customerId:
+          type: string
+        email:
+          type: string
+        userId:
+          type: string
+      required:
+      - email
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    SwitchCustomerRequestDTO:
+      type: object
+      properties:
+        customerId:
+          type: string
+      required:
+      - customerId
+    UpdateUserDTO:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 64
+          minLength: 0
+        lastName:
+          type: string
+          maxLength: 64
+          minLength: 0
+        userGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserPrivilegeDTO"
+      required:
+      - firstName
+      - lastName
+      - userGroups
+    UserCustomerDTO:
+      type: object
+      properties:
+        currentCustomerId:
+          type: string
+        customerDTOList:
+          type: array
+          items:
+            $ref: "#/components/schemas/CustomerDTO"
+    UserDTO:
+      type: object
+      properties:
+        creationDate:
+          type: string
+          format: date-time
+        customerId:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+          maxLength: 64
+          minLength: 0
+        lastModifiedDate:
+          type: string
+          format: date-time
+        lastName:
+          type: string
+          maxLength: 64
+          minLength: 0
+        nameInitials:
+          type: string
+        userGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserPrivilegeDTO"
+        userId:
+          type: string
+        username:
+          type: string
+          deprecated: true
+      required:
+      - email
+      - firstName
+      - lastName
+      - userGroups
+    UserGroupDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    UserPrivilegeDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    UserResponseDTO:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDTO"
+    UserTokenDTO:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        customerId:
+          type: string
+        userId:
+          type: string
