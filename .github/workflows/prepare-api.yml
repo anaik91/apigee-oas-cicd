@@ -9,9 +9,20 @@ on:
 jobs:
   prepare-bundle:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.PROD_WIF_POOL }}
+          service_account: ${{ secrets.PROD_SA_EMAIL }}
 
       - name: Set up Python 3
         uses: actions/setup-python@v5
