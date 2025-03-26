@@ -24,7 +24,7 @@ data "google_client_config" "default" {
 data "archive_file" "bundle" {
   type             = "zip"
   source_dir       = "${path.module}/${var.proxy_bundle_path}"
-  output_path      = "${path.module}/bundle.zip"
+  output_path      = "${path.module}/${var.proxy_name}.zip"
   output_file_mode = "0644"
 }
 
