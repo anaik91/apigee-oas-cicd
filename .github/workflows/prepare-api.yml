@@ -53,7 +53,7 @@ jobs:
             --api_base_path "$APIGEE_PROXY_BASEPATH" \
             --oas_file_location . \
             --oas_file_name httpbin.yaml
-      
+  
       - uses: hashicorp/setup-terraform@v3
 
       - name: Run terraform
