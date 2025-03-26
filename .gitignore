@@ -13,6 +13,7 @@ Enthought_project/
 *.log
 
 # Terraform
+.terraform.lock.hcl
 .terraform/
 *.tfstate
 *.tfstate.backup
