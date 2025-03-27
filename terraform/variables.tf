@@ -15,7 +15,7 @@ variable "api_proxy_path" {
 }
 
 variable "api_proxies" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 

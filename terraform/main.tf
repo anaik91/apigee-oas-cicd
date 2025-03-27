@@ -3,6 +3,12 @@ locals {
     for key in var.api_proxies : key => "${var.api_proxy_path}/${key}"
   }
 
+  proxy_revisions = {
+    for key in var.api_proxies : key => google_apigee_api.api_proxy[key].revision[
+      length(google_apigee_api.api_proxy[key].revision) - 1
+    ]
+  }
+
   shared_flow_path = {
   for key in var.shared_flows : key => "${var.shared_flow_path}/${key}" }
 }
@@ -46,24 +52,6 @@ resource "google_apigee_sharedflow_deployment" "shared_flow" {
   revision      = google_apigee_sharedflow.shared_flow[each.key].latest_revision_id
 }
 
-# data "http" "deploy_sharedflow" {
-#   for_each = local.shared_flow_path
-#   url      = "${var.apigee_mgmt_api}/organizations/${var.apigee_org}/environments/${var.apigee_env}/sharedflows/${each.key}/revisions/${google_apigee_sharedflow.shared_flow[each.key].latest_revision_id}/deployments?override=true"
-#   method   = "POST"
-
-#   request_headers = {
-#     "Authorization" : "Bearer ${data.google_client_config.default.access_token}"
-#   }
-
-#   lifecycle {
-#     postcondition {
-#       condition     = strcontains(self.response_body, "already deployed") || contains([200], self.status_code)
-#       error_message = "Failed to deploy Shareflow ${self.response_body}"
-#     }
-#   }
-# }
-
-
 data "archive_file" "bundle" {
   for_each         = local.proxy_path
   type             = "zip"
@@ -81,7 +69,7 @@ resource "google_apigee_api" "api_proxy" {
 
 data "http" "deploy_api" {
   for_each = local.proxy_path
-  url      = "${var.apigee_mgmt_api}/organizations/${var.apigee_org}/environments/${var.apigee_env}/apis/${each.key}/revisions/${google_apigee_api.api_proxy[each.key].latest_revision_id}/deployments?override=true"
+  url      = "${var.apigee_mgmt_api}/organizations/${var.apigee_org}/environments/${var.apigee_env}/apis/${each.key}/revisions/${local.proxy_revisions[each.key]}/deployments?override=true"
   method   = "POST"
 
   request_headers = {
