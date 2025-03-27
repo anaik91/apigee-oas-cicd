@@ -6,11 +6,10 @@ on:
       - main
   workflow_dispatch: # Allow manual triggering of the workflow
 
-
 env:
   APIGEE_ENV: dev
-  APIGEE_PROXY_NAME: oasapi1
-  APIGEE_PROXY_BASEPATH: /oasapi1
+  APIGEE_PROXY_NAME: oasapi2
+  APIGEE_PROXY_BASEPATH: /oasapi2
 
 jobs:
   deploy-oas:
@@ -52,7 +51,9 @@ jobs:
             --api_name "$APIGEE_PROXY_NAME" \
             --api_base_path "$APIGEE_PROXY_BASEPATH" \
             --oas_file_location . \
-            --oas_file_name httpbin.yaml
+            --oas_file_name httpbin.yaml \
+            --override_flow_name getUsersGroups \
+            --override_sf_name FC-Base-Pre
   
       - uses: hashicorp/setup-terraform@v3
 
@@ -61,11 +62,13 @@ jobs:
           cd terraform
           terraform init
           terraform plan \
+            -state=$APIGEE_PROXY_NAME.tfstate \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
             -var "proxy_name=$APIGEE_PROXY_NAME" \
             -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME"
           terraform apply \
+            -state=$APIGEE_PROXY_NAME.tfstate \
             -auto-approve \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
