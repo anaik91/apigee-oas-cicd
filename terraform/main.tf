@@ -53,10 +53,27 @@ resource "google_apigee_sharedflow" "shared_flow" {
   config_bundle = data.archive_file.shared_flow_bundle[each.key].output_path
 }
 
-resource "google_apigee_sharedflow_deployment" "shared_flow" {
+# resource "google_apigee_sharedflow_deployment" "shared_flow" {
+#   for_each      = local.shared_flow_path
+#   org_id        = var.apigee_org
+#   environment   = var.apigee_env
+#   sharedflow_id = each.key
+#   revision      = google_apigee_sharedflow.shared_flow[each.key].latest_revision_id
+# }
+
+data "http" "deploy_sharedflow" {
   for_each      = local.shared_flow_path
-  org_id        = var.apigee_org
-  environment   = var.apigee_env
-  sharedflow_id = each.key
-  revision      = google_apigee_sharedflow.shared_flow[each.key].latest_revision_id
+  url    = "${var.apigee_mgmt_api}/organizations/${var.apigee_org}/environments/${var.apigee_env}/sharedflows/${each.key}/revisions/${google_apigee_sharedflow.shared_flow[each.key].latest_revision_id}/deployments?override=true"
+  method = "POST"
+
+  request_headers = {
+    "Authorization" : "Bearer ${data.google_client_config.default.access_token}"
+  }
+
+  lifecycle {
+    postcondition {
+      condition     = strcontains(self.response_body, "already deployed") || contains([200], self.status_code)
+      error_message = "Failed to deploy API ${self.response_body}"
+    }
+  }
 }
