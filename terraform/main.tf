@@ -62,9 +62,9 @@ resource "google_apigee_sharedflow" "shared_flow" {
 # }
 
 data "http" "deploy_sharedflow" {
-  for_each      = local.shared_flow_path
-  url    = "${var.apigee_mgmt_api}/organizations/${var.apigee_org}/environments/${var.apigee_env}/sharedflows/${each.key}/revisions/${google_apigee_sharedflow.shared_flow[each.key].latest_revision_id}/deployments?override=true"
-  method = "POST"
+  for_each = local.shared_flow_path
+  url      = "${var.apigee_mgmt_api}/organizations/${var.apigee_org}/environments/${var.apigee_env}/sharedflows/${each.key}/revisions/${google_apigee_sharedflow.shared_flow[each.key].latest_revision_id}/deployments?override=true"
+  method   = "POST"
 
   request_headers = {
     "Authorization" : "Bearer ${data.google_client_config.default.access_token}"
@@ -73,7 +73,20 @@ data "http" "deploy_sharedflow" {
   lifecycle {
     postcondition {
       condition     = strcontains(self.response_body, "already deployed") || contains([200], self.status_code)
-      error_message = "Failed to deploy API ${self.response_body}"
+      error_message = "Failed to deploy Shareflow ${self.response_body}"
     }
+  }
+}
+
+resource "google_apigee_target_server" "apigee_target_server" {
+  for_each    = var.target_servers
+  name        = each.key
+  description = "Apigee Target Server: ${each.key}"
+  protocol    = each.value.protocol
+  host        = each.value.host
+  port        = each.value.port
+  env_id      = "organizations/${var.apigee_org}/environments/${var.apigee_env}"
+  s_sl_info {
+    enabled = each.value.ssl_enabled
   }
 }

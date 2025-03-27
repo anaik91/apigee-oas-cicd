@@ -31,3 +31,33 @@ variable "shared_flows" {
     "SF-spitfire-override-post"
   ]
 }
+
+variable "target_servers" {
+  type = map(object({
+    host        = string
+    port        = number
+    protocol    = string
+    ssl_enabled = bool
+  }))
+  description = "Map of target servers to use"
+  default = {
+    "user-manager-user-query" = {
+      host        = "example.com"
+      port        = 443
+      protocol    = "HTTP"
+      ssl_enabled = true
+    }
+    "user-manager-user-create" = {
+      host        = "example.com"
+      port        = 443
+      protocol    = "HTTP"
+      ssl_enabled = true
+    }
+    "auth-manager-token-introspect" = {
+      host        = "example.com"
+      port        = 443
+      protocol    = "HTTP"
+      ssl_enabled = true
+    }
+  }
+}
