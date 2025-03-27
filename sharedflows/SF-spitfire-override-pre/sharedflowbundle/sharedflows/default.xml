@@ -19,9 +19,6 @@
     <Name>Verify-JWT-HS256-Basic</Name>
   </Step>
   <Step>
-    <Name>AM-Set-Variables</Name>
-  </Step>
-  <Step>
     <Name>SC-UserLookup</Name>
   </Step>
   <Step>

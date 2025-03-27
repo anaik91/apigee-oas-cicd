@@ -48,7 +48,7 @@ data "archive_file" "shared_flow_bundle" {
 
 resource "google_apigee_sharedflow" "shared_flow" {
   for_each      = local.shared_flow_path
-  name          = var.proxy_name
+  name          = each.key
   org_id        = var.apigee_org
   config_bundle = data.archive_file.shared_flow_bundle[each.key].output_path
 }
