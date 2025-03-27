@@ -10,12 +10,13 @@ variable "apigee_env" {
   default = ""
 }
 
-variable "proxy_name" {
-  default = "proxy1"
+variable "api_proxy_path" {
+  default = ""
 }
 
-variable "proxy_bundle_path" {
-  default = ""
+variable "api_proxies" {
+  type = list(string)
+  default = []
 }
 
 variable "shared_flow_path" {

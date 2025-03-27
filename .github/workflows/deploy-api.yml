@@ -8,8 +8,7 @@ on:
 
 env:
   APIGEE_ENV: dev
-  APIGEE_PROXY_NAME: oasapi1
-  APIGEE_PROXY_BASEPATH: /oasapi1
+  TF_HTTP_PASSWORD: ${{ secrets.GH_PAT_TOKEN }}
 
 jobs:
   deploy-oas:
@@ -52,62 +51,11 @@ jobs:
             --api_base_path "$APIGEE_PROXY_BASEPATH" \
             --oas_file_location . \
             --oas_file_name httpbin.yaml
-  
-      - uses: hashicorp/setup-terraform@v3
-
-      - name: Run terraform
-        run: |
-          cd terraform
-          terraform init -backend-config="password=${{ secrets.GH_PAT_TOKEN }}"
-          terraform plan \
-            -state=$APIGEE_PROXY_NAME.tfstate \
-            -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
-            -var "apigee_env=$APIGEE_ENV" \
-            -var "proxy_name=$APIGEE_PROXY_NAME" \
-            -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
-          terraform apply \
-            -state=$APIGEE_PROXY_NAME.tfstate \
-            -auto-approve \
-            -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
-            -var "apigee_env=$APIGEE_ENV" \
-            -var "proxy_name=$APIGEE_PROXY_NAME" \
-            -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
-
-  deploy-oas-with-override:
-    needs: deploy-oas
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        env:
+          APIGEE_PROXY_NAME: oasapi1
+          APIGEE_PROXY_BASEPATH: /oasapi1
       
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          token_format: 'access_token'
-          workload_identity_provider: ${{ secrets.PROD_WIF_POOL }}
-          service_account: ${{ secrets.PROD_SA_EMAIL }}
-
-      - name: Set up Python 3
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x" # Use the latest Python 3 version
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
-      
-      - name: Install Apigee CLI
-        run: |
-          curl -L https://raw.githubusercontent.com/apigee/apigeecli/main/downloadLatest.sh | sh -
-
-      - name: Prepare API Bundle
+      - name: Prepare API Bundle with override SF
         run: |
           export PATH=$PATH:$HOME/.apigeecli/bin 
           python3 scripts/prepare_bundle.py \
@@ -119,34 +67,43 @@ jobs:
             --override_flow_name getUsersGroups \
             --override_sf_name SF-spitfire-pre
         env:
-          APIGEE_PROXY_NAME: oasapi2
-          APIGEE_PROXY_BASEPATH: /oasapi2
+            APIGEE_PROXY_NAME: oasapi2
+            APIGEE_PROXY_BASEPATH: /oasapi2
   
       - uses: hashicorp/setup-terraform@v3
+
+      - name: Clena up terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform plan \
+            -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
+            -var "apigee_env=$APIGEE_ENV" \
+            -var 'api_proxies=["oasapi1", "oasapi2"]' \
+            -var "api_proxy_path=${{ github.workspace }}" \
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
+          terraform destroy \
+            -auto-approve \
+            -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
+            -var "apigee_env=$APIGEE_ENV" \
+            -var 'api_proxies=["oasapi1", "oasapi2"]' \
+            -var "api_proxy_path=${{ github.workspace }}" \
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
 
       - name: Run terraform
         run: |
           cd terraform
-          terraform init -backend-config="password=${{ secrets.GH_PAT_TOKEN }}"
+          terraform init
           terraform plan \
-            -state=$APIGEE_PROXY_NAME.tfstate \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
-            -var "proxy_name=$APIGEE_PROXY_NAME" \
-            -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
-            -var "shared_flows=[]" \
-            -var "target_servers={}"
+            -var 'api_proxies=["oasapi1", "oasapi2"]' \
+            -var "api_proxy_path=${{ github.workspace }}" \
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
           terraform apply \
-            -state=$APIGEE_PROXY_NAME.tfstate \
             -auto-approve \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
-            -var "proxy_name=$APIGEE_PROXY_NAME" \
-            -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
-            -var "shared_flows=[]" \
-            -var "target_servers={}"
-        env:
-          APIGEE_PROXY_NAME: oasapi2
-          APIGEE_PROXY_BASEPATH: /oasapi2
+            -var 'api_proxies=["oasapi1", "oasapi2"]' \
+            -var "api_proxy_path=${{ github.workspace }}" \
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
