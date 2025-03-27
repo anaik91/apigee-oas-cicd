@@ -1,4 +1,4 @@
-name: Prepare API Bundle
+name: Deploy Apigee API from OpenAPI Spec
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
   APIGEE_PROXY_BASEPATH: /oasapi1
 
 jobs:
-  prepare-bundle:
+  deploy-oas:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
