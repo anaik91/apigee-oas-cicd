@@ -67,7 +67,8 @@ jobs:
             -var "apigee_env=$APIGEE_ENV" \
             -var "proxy_name=$APIGEE_PROXY_NAME" \
             -var "proxy_bundle_path=${{ github.workspace }}/$APIGEE_PROXY_NAME" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
+            -var "shared_flows=[]"
           terraform apply \
             -state=$APIGEE_PROXY_NAME.tfstate \
             -auto-approve \
