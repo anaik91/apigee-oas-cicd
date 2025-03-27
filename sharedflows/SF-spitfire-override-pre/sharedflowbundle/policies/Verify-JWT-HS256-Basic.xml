@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<VerifyJWT name="Verify-JWT-HS256-Basic">
+  <Algorithm>HS256</Algorithm>
+  <SecretKey>
+    <Value ref="private.secretkey"/>
+  </SecretKey>
+</VerifyJWT>

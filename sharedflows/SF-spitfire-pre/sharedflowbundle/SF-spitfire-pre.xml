@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SharedFlowBundle revision="3" name="SF-spitfire-pre">
+  <DisplayName/>
+  <Description/>
+  <Policies>
+    <Policy>JWT-Decode</Policy>
+    <Policy>RF-InvalidJWT</Policy>
+    <Policy>SC-CreateUser</Policy>
+    <Policy>SC-TokenIntrospection</Policy>
+    <Policy>JS-ExtractUserInfo</Policy>
+    <Policy>RF-CreateUserFailed</Policy>
+    <Policy>JS-DEBUG</Policy>
+    <Policy>EV-JWT</Policy>
+    <Policy>CORS-1</Policy>
+    <Policy>SC-UserLookup</Policy>
+    <Policy>AM-Set-Key</Policy>
+    <Policy>Verify-JWT-HS256-Basic</Policy>
+    <Policy>AM-Set-Variables</Policy>
+    <Policy>AM-Set-Inital-Variablesr</Policy>
+    <Policy>AM-Post-Introspect</Policy>
+  </Policies>
+  <Resources>
+    <Resource>jsc://ExtractUserInfo.js</Resource>
+    <Resource>jsc://debug1.js</Resource>
+  </Resources>
+  <SharedFlows>
+    <SharedFlow>default</SharedFlow>
+  </SharedFlows>
+  <subType>SharedFlow</subType>
+</SharedFlowBundle>

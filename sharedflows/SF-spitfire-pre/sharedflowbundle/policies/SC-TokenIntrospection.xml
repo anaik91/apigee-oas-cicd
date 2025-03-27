@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceCallout continueOnError="true" enabled="true" name="SC-TokenIntrospection">
+  <DisplayName>SC-TokenIntrospection</DisplayName>
+  <Description>Calls the token introspection endpoint</Description>
+  <Request clearPayload="true">
+    <Set>
+      <Headers>
+        <Header name="Content-Type">application/json</Header>
+      </Headers>
+      <Payload contentType="application/json">{
+  "token": "{token}"
+}</Payload>
+      <Verb>POST</Verb>
+    </Set>
+  </Request>
+  <Response>TokenIntrospectionResponse</Response>
+  <HTTPTargetConnection>
+    <LoadBalancer>
+      <Algorithm>RoundRobin</Algorithm>
+      <Server name="spitfire"/>
+    </LoadBalancer>
+    <Path>/spitfire_validate_token</Path>
+  </HTTPTargetConnection>
+  <!-- <HTTPTargetConnection>
+  <URL>https://apigee.34.117.238.243.nip.io/spitfire_user_crud</URL>
+</HTTPTargetConnection> -->
+</ServiceCallout>

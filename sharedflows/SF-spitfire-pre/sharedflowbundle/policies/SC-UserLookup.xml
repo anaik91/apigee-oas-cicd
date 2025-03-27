@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceCallout continueOnError="true" enabled="true" name="SC-UserLookup">
+  <DisplayName>SC-UserLookup</DisplayName>
+  <Properties/>
+  <Request clearPayload="true" variable="myRequest">
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <Set>
+      <QueryParams>
+        <QueryParam name="email">{email}</QueryParam>
+        <QueryParam name="externalOrganizationId">{externalOrgId}</QueryParam>
+      </QueryParams>
+      <Headers>
+        <Header name="external-organization-type">{external-organization-type}</Header>
+      </Headers>
+      <Verb>GET</Verb>
+    </Set>
+  </Request>
+  <Response>UserCalloutResponse</Response>
+  <HTTPTargetConnection>
+    <LoadBalancer>
+      <Algorithm>RoundRobin</Algorithm>
+      <Server name="spitfire"/>
+    </LoadBalancer>
+    <Path>/spitfire_user_crud</Path>
+  </HTTPTargetConnection>
+  <!-- <HTTPTargetConnection>
+  <URL>https://apigee.34.117.238.243.nip.io/spitfire_user_crud</URL>
+</HTTPTargetConnection> -->
+</ServiceCallout>

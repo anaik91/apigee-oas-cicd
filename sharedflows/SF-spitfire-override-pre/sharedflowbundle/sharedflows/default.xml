@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SharedFlow name="default">
+  <Step>
+    <Name>CORS-1</Name>
+  </Step>
+  <Step>
+    <Name>EV-JWT</Name>
+  </Step>
+  <Step>
+    <Name>JWT-Decode</Name>
+  </Step>
+  <Step>
+    <Name>AM-Set-Inital-Variables</Name>
+  </Step>
+  <Step>
+    <Name>AM-Set-Key</Name>
+  </Step>
+  <Step>
+    <Name>Verify-JWT-HS256-Basic</Name>
+  </Step>
+  <Step>
+    <Name>AM-Set-Variables</Name>
+  </Step>
+  <Step>
+    <Name>SC-UserLookup</Name>
+  </Step>
+  <Step>
+    <Name>JS-DEBUG</Name>
+    <Condition>(request.header.debug = "true")</Condition>
+  </Step>
+  <Step>
+    <Name>JS-ExtractUserInfo</Name>
+    <Condition>(UserCalloutResponse.status.code = "200")</Condition>
+  </Step>
+  <Step>
+    <Name>RF-UserLookupFailed</Name>
+    <Condition>(UserCalloutResponse.status.code != "200")</Condition>
+  </Step>
+</SharedFlow>

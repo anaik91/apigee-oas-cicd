@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SharedFlow name="default">
+  <Step>
+    <Name>CORS-1</Name>
+  </Step>
+  <Step>
+    <Name>EV-JWT</Name>
+  </Step>
+  <Step>
+    <Name>JWT-Decode</Name>
+  </Step>
+  <Step>
+    <Name>AM-Set-Inital-Variables</Name>
+  </Step>
+  <!-- <Condition>issuer == "ExchangeTokens"</Condition> -->
+  <Step>
+    <Name>AM-Set-Key</Name>
+    <Condition>(issuer == "ExchangeTokens")</Condition>
+  </Step>
+  <Step>
+    <Name>Verify-JWT-HS256-Basic</Name>
+    <Condition>(issuer == "ExchangeTokens")</Condition>
+  </Step>
+  <Step>
+    <Name>AM-Set-Variables</Name>
+    <Condition>(issuer == "ExchangeTokens")</Condition>
+  </Step>
+  <Step>
+    <Name>SC-UserLookup</Name>
+    <Condition>(issuer == "ExchangeTokens")</Condition>
+  </Step>
+  <Step>
+    <Name>JS-DEBUG</Name>
+    <Condition>(issuer == "ExchangeTokens") and (request.header.debug = "true")</Condition>
+  </Step>
+  <Step>
+    <Name>SC-CreateUser</Name>
+    <Condition>(issuer == "ExchangeTokens") and (UserCalloutResponse.status.code = "404")</Condition>
+  </Step>
+  <Step>
+    <Name>RF-CreateUserFailed</Name>
+    <Condition>(issuer == "ExchangeTokens") and (UserCalloutResponse.status.code != "200")</Condition>
+  </Step>
+  <Step>
+    <Name>JS-ExtractUserInfo</Name>
+    <Condition>(issuer == "ExchangeTokens") and (UserCalloutResponse.status.code = "200")</Condition>
+  </Step>
+  <!-- <Condition>(issuer == "ExchangeTokens")</Condition> -->
+  <!-- <Condition>(issuer != "ExchangeTokens")</Condition> -->
+  <Step>
+    <Name>SC-TokenIntrospection</Name>
+    <Condition>(issuer != "ExchangeTokens")</Condition>
+  </Step>
+  <Step>
+    <Name>RF-InvalidJWT</Name>
+    <Condition>(issuer != "ExchangeTokens") and (TokenIntrospectionResponse.response.status.code = "401")</Condition>
+  </Step>
+  <Step>
+    <Name>AM-Post-Introspect</Name>
+    <Condition>(issuer != "ExchangeTokens") and (TokenIntrospectionResponse.response.status.code = "200")</Condition>
+  </Step>
+  <Step>
+    <Name>SC-UserLookup</Name>
+    <Condition>(issuer != "ExchangeTokens") and (TokenIntrospectionResponse.response.status.code = "200")</Condition>
+  </Step>
+  <Step>
+    <Name>SC-CreateUser</Name>
+    <Condition>(issuer != "ExchangeTokens") and (UserCalloutResponse.response.status.code == "404")</Condition>
+  </Step>
+  <Step>
+    <Name>JS-ExtractUserInfo</Name>
+    <Condition>(issuer != "ExchangeTokens") and (UserCalloutResponse.response.status.code == "200")</Condition>
+  </Step>
+  <!-- <Condition>(issuer != "ExchangeTokens")</Condition> -->
+</SharedFlow>

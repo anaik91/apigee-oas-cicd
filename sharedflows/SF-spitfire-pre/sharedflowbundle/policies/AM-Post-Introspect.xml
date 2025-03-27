@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-Post-Introspect">
+  <DisplayName>AM-Post-Introspect</DisplayName>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignVariable>
+    <Name>externalOrgId</Name>
+    <Ref>jwt.JWT-Decode.claim.agency</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>email</Name>
+    <Ref>jwt.JWT-Decode.claim.sub</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>create-user-payload</Name>
+    <Template>{
+          "email": "{jwt.JWT-Decode.claim.su}",
+          "externalOrganizationId": "{jwt.JWT-Decode.claim.agency}",
+  }</Template>
+  </AssignVariable>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

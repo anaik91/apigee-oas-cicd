@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-Set-Variables">
+  <DisplayName>AM-Set-Variables</DisplayName>
+  <AssignVariable>
+    <Name>email</Name>
+    <Ref>jwt.Verify-JWT-HS256-Basic.decoded.claim.email</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>externalOrgId</Name>
+    <Ref>jwt.Verify-JWT-HS256-Basic.decoded.claim.orgId</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>name</Name>
+    <Ref>jwt.Verify-JWT-HS256-Basic.decoded.claim.name</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>external-organization-type</Name>
+    <Value>UNITY</Value>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>create-user-payload</Name>
+    <Template>{
+          "email": "{jwt.Verify-JWT-HS256-Basic.decoded.claim.email}",
+          "externalOrganizationId": "{jwt.Verify-JWT-HS256-Basic.decoded.claim.orgId}",
+          "name": "{jwt.Verify-JWT-HS256-Basic.decoded.claim.name}"
+  }</Template>
+  </AssignVariable>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

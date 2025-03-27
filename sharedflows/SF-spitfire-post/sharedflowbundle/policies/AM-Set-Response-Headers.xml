@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-Set-Response-Headers">
+  <DisplayName>AM-Set-Response-Headers</DisplayName>
+  <Set>
+    <Headers>
+      <Header name="customerId">{customerId}</Header>
+      <Header name="cloudCustomerId">{customerId}</Header>
+      <Header name="userId">{userId}</Header>
+      <Header name="external-organization-type">UNITY</Header>
+    </Headers>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo>response</AssignTo>
+</AssignMessage>

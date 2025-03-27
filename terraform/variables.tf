@@ -17,3 +17,16 @@ variable "proxy_name" {
 variable "proxy_bundle_path" {
   default = ""
 }
+
+variable "shared_flow_path" {
+  default = ""
+}
+
+variable "shared_flows" {
+  default = [
+    "SF-spitfire-pre",
+    "SF-spitfire-post",
+    "SF-spitfire-override-pre",
+    "SF-spitfire-override-post"
+  ]
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Javascript continueOnError="false" enabled="true" timeLimit="200" name="JS-ExtractUserInfo">
+  <DisplayName>JS-ExtractUserInfo</DisplayName>
+  <Properties/>
+  <ResourceURL>jsc://ExtractUserInfo.js</ResourceURL>
+</Javascript>

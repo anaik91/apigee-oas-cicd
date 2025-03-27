@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceCallout name="SC-CreateUser">
+  <DisplayName>SC-CreateUser</DisplayName>
+  <Description>Calls the user manager service to create a user</Description>
+  <Request clearPayload="true">
+    <Set>
+      <Headers>
+        <Header name="Content-Type">application/json</Header>
+        <Header name="external-organization-type">UNITY</Header>
+        <Header name="Authorization">{authorization-header}</Header>
+      </Headers>
+      <Payload contentType="application/json">{create-user-payload}</Payload>
+      <Verb>PUT</Verb>
+    </Set>
+  </Request>
+  <Response>UserCalloutResponse</Response>
+  <HTTPTargetConnection>
+    <LoadBalancer>
+      <Algorithm>RoundRobin</Algorithm>
+      <Server name="spitfire"/>
+    </LoadBalancer>
+    <Path>/spitfire_user_crud</Path>
+  </HTTPTargetConnection>
+  <!-- <HTTPTargetConnection>
+  <URL>https://apigee.34.117.238.243.nip.io/spitfire_user_crud</URL>
+</HTTPTargetConnection> -->
+<Timeout>60000</Timeout>
+</ServiceCallout>

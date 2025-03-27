@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-Set-Inital-Variables">
+  <DisplayName>AM-Set-Inital-Variables</DisplayName>
+  <AssignVariable>
+    <Name>issuer</Name>
+    <Ref>jwt.JWT-Decode.claim.issuer</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>token</Name>
+    <Ref>inbound.jwt</Ref>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>authorization-header</Name>
+    <Ref>request.header.authorization</Ref>
+  </AssignVariable>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>
