@@ -19,11 +19,6 @@ locals {
   latest_revision = local.revisions[length(local.revisions) - 1]
   shared_flow_path = {
   for key in var.shared_flows : key => "${var.shared_flow_path}/${key}" }
-
-  shared_flow_revisions = {
-    for sf in local.shared_flow_path :
-    sf => google_apigee_sharedflow.shared_flow[sf].revisions[length(google_apigee_sharedflow.shared_flow[sf].revisions) - 1]
-  }
 }
 
 data "http" "deploy_api" {
@@ -59,9 +54,9 @@ resource "google_apigee_sharedflow" "shared_flow" {
 }
 
 resource "google_apigee_sharedflow_deployment" "shared_flow" {
-  for_each      = local.shared_flow_revisions
+  for_each      = local.shared_flow_path
   org_id        = var.apigee_org
   environment   = var.apigee_env
   sharedflow_id = each.key
-  revision      = each.value
+  revision      = google_apigee_sharedflow.shared_flow[each.key].latest_revision_id
 }
