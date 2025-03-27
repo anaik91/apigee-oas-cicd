@@ -53,7 +53,7 @@ jobs:
             --oas_file_location . \
             --oas_file_name httpbin.yaml \
             --override_flow_name getUsersGroups \
-            --override_sf_name FC-Base-Pre
+            --override_sf_name SF-spitfire-pre
   
       - uses: hashicorp/setup-terraform@v3
 
