@@ -23,6 +23,7 @@ variable "shared_flow_path" {
 }
 
 variable "shared_flows" {
+  type = list(string)
   default = [
     "SF-spitfire-pre",
     "SF-spitfire-post",
