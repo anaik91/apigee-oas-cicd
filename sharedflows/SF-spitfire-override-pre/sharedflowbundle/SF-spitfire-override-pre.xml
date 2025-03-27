@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SharedFlowBundle revision="3" name="SF-spitfire-override">
+<SharedFlowBundle revision="3" name="SF-spitfire-override-pre">
   <DisplayName/>
-  <Description/>
+  <Description>SF-spitfire-override-pre</Description>
   <Policies>
     <Policy>JWT-Decode</Policy>
     <Policy>RF-InvalidJWT</Policy>

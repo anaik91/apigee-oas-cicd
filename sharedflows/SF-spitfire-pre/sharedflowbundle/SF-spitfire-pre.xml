@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SharedFlowBundle revision="3" name="SF-spitfire-pre">
   <DisplayName/>
-  <Description/>
+  <Description>SF-spitfire-pre</Description>
   <Policies>
     <Policy>JWT-Decode</Policy>
     <Policy>RF-InvalidJWT</Policy>

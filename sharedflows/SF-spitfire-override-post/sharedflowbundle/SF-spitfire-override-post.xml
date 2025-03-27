@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SharedFlowBundle revision="1" name="SF-spitfire-override-post">
   <DisplayName/>
-  <Description/>
+  <Description>SF-spitfire-override-post</Description>
   <Policies>
     <Policy>AM-Set-Response-Headers</Policy>
   </Policies>
