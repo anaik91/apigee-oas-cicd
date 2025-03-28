@@ -50,7 +50,9 @@ jobs:
             --api_name "$APIGEE_PROXY_NAME" \
             --api_base_path "$APIGEE_PROXY_BASEPATH" \
             --oas_file_location . \
-            --oas_file_name httpbin.yaml
+            --oas_file_name httpbin.yaml \
+            --base_sf_pre SF-spitfire-pre \
+            --base_sf_post SF-spitfire-post
         env:
           APIGEE_PROXY_NAME: oasapi1
           APIGEE_PROXY_BASEPATH: /oasapi1
