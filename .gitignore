@@ -11,7 +11,7 @@ venv/
 env/
 Enthought_project/
 *.log
-
+*.pem
 # Terraform
 .terraform.lock.hcl
 .terraform/
