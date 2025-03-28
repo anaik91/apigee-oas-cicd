@@ -97,4 +97,4 @@ jobs:
                       protocol    = "HTTP"
                       ssl_enabled = true
                     }
-                  }' || (ls -l && ls -l ${{ github.workspace}})
+                  }'

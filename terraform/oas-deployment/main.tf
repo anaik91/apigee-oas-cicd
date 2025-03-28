@@ -49,14 +49,6 @@ resource "null_resource" "prepare_apigee_bundle" {
   }
 }
 
-# data "archive_file" "bundle" {
-#   for_each         = local.proxy_path
-#   type             = "zip"
-#   source_dir       = each.value
-#   output_path      = "${each.key}.zip"
-#   output_file_mode = "0644"
-# }
-
 resource "google_apigee_api" "api_proxy" {
   name          = var.apigee_proxy_name
   org_id        = var.apigee_org
