@@ -1,30 +1,37 @@
 variable "apigee_mgmt_api" {
-  default = "https://apigee.googleapis.com/v1"
+  description = "The base URL for the Apigee Management API."
+  default     = "https://apigee.googleapis.com/v1"
 }
 
 variable "apigee_org" {
-  default = ""
+  description = "The Apigee organization name."
+  default     = ""
 }
 
 variable "apigee_env" {
-  default = ""
+  description = "The Apigee environment name (e.g., 'dev', 'prod')."
+  default     = ""
 }
 
 variable "api_proxy_path" {
-  default = ""
+  description = "The base path where API proxy bundles are located."
+  default     = ""
 }
 
 variable "api_proxies" {
-  type    = list(string)
-  default = []
+  description = "A list of API proxy names to be deployed."
+  type        = list(string)
+  default     = []
 }
 
 variable "shared_flow_path" {
-  default = ""
+  description = "The base path where shared flow bundles are located."
+  default     = ""
 }
 
 variable "shared_flows" {
-  type = list(string)
+  description = "A list of shared flow names to be deployed."
+  type        = list(string)
   default = [
     "SF-spitfire-pre",
     "SF-spitfire-post",
@@ -34,11 +41,13 @@ variable "shared_flows" {
 }
 
 variable "kvm_name" {
-  default = "openid_config"
+  description = "The name of the Key-Value Map (KVM) to store openid discovery config."
+  default     = "openid_config"
 }
 
 variable "openid_discovery_endpoint" {
-  default = ""
+  description = "The OpenID Connect discovery endpoint URL."
+  default     = ""
 }
 
 variable "target_servers" {
@@ -48,7 +57,7 @@ variable "target_servers" {
     protocol    = string
     ssl_enabled = bool
   }))
-  description = "Map of target servers to use"
+  description = "Map of target servers to use across all APIs"
   default = {
     "user-manager-user-query" = {
       host        = "example.com"
