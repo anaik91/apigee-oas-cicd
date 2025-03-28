@@ -82,7 +82,7 @@ jobs:
             -var 'api_proxies=["oasapi1", "oasapi2"]' \
             -var "api_proxy_path=${{ github.workspace }}" \
             -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
-            -var "openid_discovery_endpoint=${{ secrets.APIGEE_TARGET_SERVER }}" \
+            -var "openid_discovery_endpoint=https://${{ secrets.APIGEE_TARGET_SERVER }}/jwks" \
             -var 'target_servers={
                     "user-manager-user-query" = {
                       host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
@@ -91,7 +91,7 @@ jobs:
                       ssl_enabled = true
                     },
                     "user-manager-user-create" = {
-                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}m"
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
                       port        = 443
                       protocol    = "HTTP"
                       ssl_enabled = true
@@ -119,7 +119,7 @@ jobs:
                       ssl_enabled = true
                     },
                     "user-manager-user-create" = {
-                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}m"
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
                       port        = 443
                       protocol    = "HTTP"
                       ssl_enabled = true
