@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <VerifyJWT name="Verify-JWT-HS256-Basic">
-  <Algorithm>HS256</Algorithm>
-  <SecretKey>
-    <Value ref="private.secretkey"/>
-  </SecretKey>
+  <Algorithm>RS256</Algorithm>
+  <!-- <Algorithm>HS256</Algorithm> -->
+  <!-- <SecretKey>
+  <Value ref="private.secretkey"/>
+</SecretKey> -->
+<PublicKey>
+  <JWKS uri="https://apigee.34.117.238.243.nip.io/jwks"/>
+  <CacheExpiryInSeconds>3600</CacheExpiryInSeconds>
+</PublicKey>
 </VerifyJWT>
