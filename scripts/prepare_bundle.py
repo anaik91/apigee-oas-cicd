@@ -397,7 +397,10 @@ def main():
     parser.add_argument("--oas_file_location", required=True, help="OAS file location")
     parser.add_argument("--oas_file_name", required=True, help="OAS file name")
     parser.add_argument("--override_flow_names", default="", help="Comma separated list of flow operations to override")
-    parser.add_argument("--override_sf_name",default="", help="Shared flow to override with")
+    parser.add_argument("--base_sf_pre",required=True, help="Request Shared flow to override with")
+    parser.add_argument("--base_sf_post",required=True, help="Response Shared flow to override with")
+    parser.add_argument("--override_sf_pre",default="", help="Request Shared flow to override with")
+    parser.add_argument("--override_sf_post",default="", help="Response Shared flow to override with")
 
     args = parser.parse_args()
     apigee_org = args.apigee_org
@@ -408,10 +411,13 @@ def main():
 
     override_flow = args.override_flow_names.split(',') if len(args.override_flow_names) > 0 else []
 
-    if len(override_flow) > 0 and len(args.override_sf_name) == 0:
+    if len(override_flow) > 0 and (len(args.override_sf_pre) == 0 and len(args.override_sf_post)):
         logging.error("Please provide --override_sf_name since you have provided --override_flow_names")
         sys.exit(1)
-    override_sf_name = args.override_sf_name
+    base_sf_pre = args.base_sf_pre
+    base_sf_post = args.base_sf_post
+    override_sf_pre = args.override_sf_pre
+    override_sf_post = args.override_sf_post
 
     api1 = ApigeeCliRunner(
         basepath=api_base_path,
@@ -434,11 +440,11 @@ def main():
             proxy_path = api_name
 
             policy1_name="FC-Base-Pre"
-            policy1="""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            policy1=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <FlowCallout continueOnError="false" enabled="true" name="FC-Base-Pre">
 <DisplayName>FC-Base-Pre</DisplayName>
 <Parameters/>
-<SharedFlowBundle>SF-spitfire-pre</SharedFlowBundle>
+<SharedFlowBundle>{base_sf_pre}</SharedFlowBundle>
 </FlowCallout>
 """
             api1.inject_policy(
@@ -448,11 +454,11 @@ def main():
             )
 
             policy2_name="FC-Base-Post"
-            policy2="""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            policy2=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <FlowCallout continueOnError="false" enabled="true" name="FC-Base-Post">
 <DisplayName>FC-Base-Post</DisplayName>
 <Parameters/>
-<SharedFlowBundle>SF-spitfire-post</SharedFlowBundle>
+<SharedFlowBundle>{base_sf_post}</SharedFlowBundle>
 </FlowCallout>
 """
             api1.inject_policy(
@@ -465,12 +471,12 @@ def main():
             # logging.info(f"Flows list:  {all_flows}")
 
             if len(override_flow) > 0:
-                policy3_name="FC-override"
+                policy3_name="FC-override-pre"
                 policy3=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<FlowCallout continueOnError="false" enabled="true" name="FC-override">
-<DisplayName>FC-override</DisplayName>
+<FlowCallout continueOnError="false" enabled="true" name="FC-override-pre">
+<DisplayName>FC-override-pre</DisplayName>
 <Parameters/>
-<SharedFlowBundle>{override_sf_name}</SharedFlowBundle>
+<SharedFlowBundle>{override_sf_pre}</SharedFlowBundle>
 </FlowCallout>
 """
                 api1.inject_policy(
@@ -478,14 +484,33 @@ def main():
                     policy3_name,
                     policy3
                 )
-                override_policy = "FC-override"
+
+                policy4_name="FC-override-post"
+                policy4=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FlowCallout continueOnError="false" enabled="true" name="FC-override-post">
+<DisplayName>FC-override-post</DisplayName>
+<Parameters/>
+<SharedFlowBundle>{override_sf_post}</SharedFlowBundle>
+</FlowCallout>
+"""
+                api1.inject_policy(
+                    proxy_path,
+                    policy4_name,
+                    policy4
+                )
                 for flow_name in all_flows:
                     if flow_name in override_flow:
                         api1.inject_shared_flow_to_flows(
                             proxy_path,
-                            override_policy,
+                            policy3_name,
                             [flow_name],
                             flow_type="Request"
+                        )
+                        api1.inject_shared_flow_to_flows(
+                            proxy_path,
+                            policy4_name,
+                            [flow_name],
+                            flow_type="Response"
                         )
                     else:
                         api1.inject_shared_flow_to_flows(
