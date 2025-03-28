@@ -1,16 +1,38 @@
 variable "apigee_org" {
   description = "The Apigee organization name."
-  default     = "apigee-payg-377208"
+  default     = ""
 }
 
 variable "apigee_env" {
   description = "The Apigee environment name (e.g., 'dev', 'prod')."
-  default     = "dev"
+  default     = ""
+}
+
+
+variable "shared_flow_path" {
+  description = "The base path where shared flow bundles are located."
+  default     = ""
+}
+
+variable "shared_flows" {
+  description = "A list of shared flow names to be deployed."
+  type        = list(string)
+  default = [
+    "SF-spitfire-pre",
+    "SF-spitfire-post",
+    "SF-spitfire-override-pre",
+    "SF-spitfire-override-post"
+  ]
+}
+
+variable "kvm_name" {
+  description = "The name of the Key-Value Map (KVM) to store openid discovery config."
+  default     = "openid_config"
 }
 
 variable "openid_discovery_endpoint" {
   description = "The OpenID Connect discovery endpoint URL."
-  default     = "https://apigee.34.117.238.243.nip.io/jwks"
+  default     = ""
 }
 
 variable "target_servers" {

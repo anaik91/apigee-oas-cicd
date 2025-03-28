@@ -42,51 +42,16 @@ jobs:
         run: |
           curl -L https://raw.githubusercontent.com/apigee/apigeecli/main/downloadLatest.sh | sh -
 
-      - name: Prepare API Bundle
-        run: |
-          export PATH=$PATH:$HOME/.apigeecli/bin 
-          python3 scripts/prepare_bundle.py \
-            --apigee_org ${{ secrets.APIGEE_ORG }} \
-            --api_name "$APIGEE_PROXY_NAME" \
-            --api_base_path "$APIGEE_PROXY_BASEPATH" \
-            --oas_file_location . \
-            --oas_file_name httpbin.yaml \
-            --base_sf_pre SF-spitfire-pre \
-            --base_sf_post SF-spitfire-post
-        env:
-          APIGEE_PROXY_NAME: oasapi1
-          APIGEE_PROXY_BASEPATH: /oasapi1
-      
-      - name: Prepare API Bundle with override SF
-        run: |
-          export PATH=$PATH:$HOME/.apigeecli/bin 
-          python3 scripts/prepare_bundle.py \
-            --apigee_org ${{ secrets.APIGEE_ORG }} \
-            --api_name "$APIGEE_PROXY_NAME" \
-            --api_base_path "$APIGEE_PROXY_BASEPATH" \
-            --oas_file_location . \
-            --oas_file_name httpbin.yaml \
-            --override_flow_name getUsersGroups \
-            --base_sf_pre SF-spitfire-pre \
-            --base_sf_post SF-spitfire-post \
-            --override_sf_pre SF-spitfire-override-pre \
-            --override_sf_post SF-spitfire-override-post
-        env:
-            APIGEE_PROXY_NAME: oasapi2
-            APIGEE_PROXY_BASEPATH: /oasapi2
-  
       - uses: hashicorp/setup-terraform@v3
 
       - name: Run terraform
         run: |
+          export PATH=$PATH:$HOME/.apigeecli/bin 
           cd terraform
           terraform init
           terraform plan \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
-            -var 'api_proxies=["oasapi1", "oasapi2"]' \
-            -var "api_proxy_path=${{ github.workspace }}" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
             -var "openid_discovery_endpoint=https://${{ secrets.APIGEE_TARGET_SERVER }}/jwks" \
             -var 'target_servers={
                     "user-manager-user-query" = {
@@ -112,10 +77,7 @@ jobs:
             -auto-approve \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
-            -var 'api_proxies=["oasapi1", "oasapi2"]' \
-            -var "api_proxy_path=${{ github.workspace }}" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
-            -var "openid_discovery_endpoint=${{ secrets.APIGEE_TARGET_SERVER }}" \
+            -var "openid_discovery_endpoint=https://${{ secrets.APIGEE_TARGET_SERVER }}/jwks" \
             -var 'target_servers={
                     "user-manager-user-query" = {
                       host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
