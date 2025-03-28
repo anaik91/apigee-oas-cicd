@@ -61,6 +61,7 @@ resource "google_apigee_api" "api_proxy" {
   name          = var.apigee_proxy_name
   org_id        = var.apigee_org
   config_bundle = "${var.apigee_proxy_name}.zip"
+  depends_on = [ null_resource.prepare_apigee_bundle ]
 }
 
 data "http" "deploy_api" {
