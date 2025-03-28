@@ -33,6 +33,14 @@ variable "shared_flows" {
   ]
 }
 
+variable "kvm_name" {
+  default = "openid_config"
+}
+
+variable "openid_discovery_endpoint" {
+  default = ""
+}
+
 variable "target_servers" {
   type = map(object({
     host        = string
@@ -47,13 +55,13 @@ variable "target_servers" {
       port        = 443
       protocol    = "HTTP"
       ssl_enabled = true
-    }
+    },
     "user-manager-user-create" = {
       host        = "example.com"
       port        = 443
       protocol    = "HTTP"
       ssl_enabled = true
-    }
+    },
     "auth-manager-token-introspect" = {
       host        = "example.com"
       port        = 443

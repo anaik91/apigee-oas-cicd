@@ -17,12 +17,9 @@
   <HTTPTargetConnection>
     <LoadBalancer>
       <Algorithm>RoundRobin</Algorithm>
-      <Server name="spitfire"/>
+      <Server name="user-manager-user-create"/>
     </LoadBalancer>
     <Path>/spitfire_user_crud</Path>
   </HTTPTargetConnection>
-  <!-- <HTTPTargetConnection>
-  <URL>https://apigee.34.117.238.243.nip.io/spitfire_user_crud</URL>
-</HTTPTargetConnection> -->
 <Timeout>60000</Timeout>
 </ServiceCallout>

@@ -81,11 +81,53 @@ jobs:
             -var "apigee_env=$APIGEE_ENV" \
             -var 'api_proxies=["oasapi1", "oasapi2"]' \
             -var "api_proxy_path=${{ github.workspace }}" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
+            -var "openid_discovery_endpoint=${{ secrets.APIGEE_TARGET_SERVER }}" \
+            -var 'target_servers={
+                    "user-manager-user-query" = {
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
+                      port        = 443
+                      protocol    = "HTTP"
+                      ssl_enabled = true
+                    },
+                    "user-manager-user-create" = {
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}m"
+                      port        = 443
+                      protocol    = "HTTP"
+                      ssl_enabled = true
+                    },
+                    "auth-manager-token-introspect" = {
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
+                      port        = 443
+                      protocol    = "HTTP"
+                      ssl_enabled = true
+                    }
+                  }'
           terraform apply \
             -auto-approve \
             -var "apigee_org=${{ secrets.APIGEE_ORG }}" \
             -var "apigee_env=$APIGEE_ENV" \
             -var 'api_proxies=["oasapi1", "oasapi2"]' \
             -var "api_proxy_path=${{ github.workspace }}" \
-            -var "shared_flow_path=${{ github.workspace }}/sharedflows"
+            -var "shared_flow_path=${{ github.workspace }}/sharedflows" \
+            -var "openid_discovery_endpoint=${{ secrets.APIGEE_TARGET_SERVER }}" \
+            -var 'target_servers={
+                    "user-manager-user-query" = {
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
+                      port        = 443
+                      protocol    = "HTTP"
+                      ssl_enabled = true
+                    },
+                    "user-manager-user-create" = {
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}m"
+                      port        = 443
+                      protocol    = "HTTP"
+                      ssl_enabled = true
+                    },
+                    "auth-manager-token-introspect" = {
+                      host        = "${{ secrets.APIGEE_TARGET_SERVER }}"
+                      port        = 443
+                      protocol    = "HTTP"
+                      ssl_enabled = true
+                    }
+                  }'

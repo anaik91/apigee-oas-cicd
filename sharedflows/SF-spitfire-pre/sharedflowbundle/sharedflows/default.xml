@@ -13,8 +13,12 @@
     <Name>AM-Set-Inital-Variables</Name>
   </Step>
   <!-- <Condition>issuer == "ExchangeTokens"</Condition> -->
-  <Step>
+  <!-- <Step>
     <Name>AM-Set-Key</Name>
+    <Condition>(issuer == "ExchangeTokens")</Condition>
+  </Step> -->
+  <Step>
+    <Name>KVM-get-openid</Name>
     <Condition>(issuer == "ExchangeTokens")</Condition>
   </Step>
   <Step>

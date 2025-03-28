@@ -13,6 +13,10 @@
     <Name>authorization-header</Name>
     <Ref>request.header.authorization</Ref>
   </AssignVariable>
+  <AssignVariable>
+    <Name>jwks-url</Name>
+    <Template>https://{}/jwks</Template>
+  </AssignVariable>
   <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
   <AssignTo createNew="false" transport="http" type="request"/>
 </AssignMessage>

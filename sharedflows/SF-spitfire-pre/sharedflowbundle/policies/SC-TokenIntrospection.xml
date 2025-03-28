@@ -17,11 +17,8 @@
   <HTTPTargetConnection>
     <LoadBalancer>
       <Algorithm>RoundRobin</Algorithm>
-      <Server name="spitfire"/>
+      <Server name="auth-manager-token-introspect"/>
     </LoadBalancer>
     <Path>/spitfire_validate_token</Path>
   </HTTPTargetConnection>
-  <!-- <HTTPTargetConnection>
-  <URL>https://apigee.34.117.238.243.nip.io/spitfire_user_crud</URL>
-</HTTPTargetConnection> -->
 </ServiceCallout>
