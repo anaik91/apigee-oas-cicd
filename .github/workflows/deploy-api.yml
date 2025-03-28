@@ -67,7 +67,6 @@ jobs:
             --oas_file_location . \
             --oas_file_name httpbin.yaml \
             --override_flow_name getUsersGroups \
-            --override_sf_name SF-spitfire-pre \
             --base_sf_pre SF-spitfire-pre \
             --base_sf_post SF-spitfire-post \
             --override_sf_pre SF-spitfire-override-pre \
