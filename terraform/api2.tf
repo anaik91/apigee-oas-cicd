@@ -1,7 +1,7 @@
 module "api2" {
   source                = "./oas-deployment"
-  apigee_org            = "apigee-payg-377208"
-  apigee_env            = "dev"
+  apigee_org            = var.apigee_org
+  apigee_env            = var.apigee_env
   api_proxy_path        = path.cwd
   apigee_proxy_name     = "oas2"
   apigee_proxy_basepath = "/oas2"
