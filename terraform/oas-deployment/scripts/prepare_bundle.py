@@ -388,6 +388,15 @@ class ApigeeCliRunner:
             logging.exception(" An error occurred during proxy validation ")
             return None
 
+def flow_callout_template(fc_name, sf_name) -> str:
+    return f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FlowCallout continueOnError="false" enabled="true" name="{fc_name}">
+<DisplayName>{fc_name}</DisplayName>
+<Parameters/>
+<SharedFlowBundle>{sf_name}</SharedFlowBundle>
+</FlowCallout>
+"""
+
 def main():
 
     parser = argparse.ArgumentParser(description="Create and modify Apigee API proxies.")
@@ -438,29 +447,25 @@ def main():
             api1.unzip_bundle(bundle_path)
 
             proxy_path = api_name
-
-            policy1_name="FC-Base-Pre"
-            policy1=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<FlowCallout continueOnError="false" enabled="true" name="FC-Base-Pre">
-<DisplayName>FC-Base-Pre</DisplayName>
-<Parameters/>
-<SharedFlowBundle>{base_sf_pre}</SharedFlowBundle>
-</FlowCallout>
-"""
+            
+            # Inject Base Flow Callout Request Flow
+            policy1_name="FC-base-request-process"
+            policy1=flow_callout_template(
+                policy1_name,
+                base_sf_pre
+            )
             api1.inject_policy(
                 proxy_path,
                 policy1_name,
                 policy1
             )
 
-            policy2_name="FC-Base-Post"
-            policy2=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<FlowCallout continueOnError="false" enabled="true" name="FC-Base-Post">
-<DisplayName>FC-Base-Post</DisplayName>
-<Parameters/>
-<SharedFlowBundle>{base_sf_post}</SharedFlowBundle>
-</FlowCallout>
-"""
+            # Inject Base Flow Callout Response Flow
+            policy2_name="FC-base-response-process"
+            policy2=flow_callout_template(
+                policy2_name,
+                base_sf_post
+            )
             api1.inject_policy(
                 proxy_path,
                 policy2_name,
@@ -471,28 +476,24 @@ def main():
             # logging.info(f"Flows list:  {all_flows}")
 
             if len(override_flow) > 0:
-                policy3_name="FC-override-pre"
-                policy3=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<FlowCallout continueOnError="false" enabled="true" name="FC-override-pre">
-<DisplayName>FC-override-pre</DisplayName>
-<Parameters/>
-<SharedFlowBundle>{override_sf_pre}</SharedFlowBundle>
-</FlowCallout>
-"""
+                # Inject Override Flow Callout Request Flow
+                policy3_name="FC-override-request-process"
+                policy3=flow_callout_template(
+                    policy3_name,
+                    override_sf_pre
+                )
                 api1.inject_policy(
                     proxy_path,
                     policy3_name,
                     policy3
                 )
 
-                policy4_name="FC-override-post"
-                policy4=f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<FlowCallout continueOnError="false" enabled="true" name="FC-override-post">
-<DisplayName>FC-override-post</DisplayName>
-<Parameters/>
-<SharedFlowBundle>{override_sf_post}</SharedFlowBundle>
-</FlowCallout>
-"""
+                # Inject Override Flow Callout Response Flow
+                policy4_name="FC-override-response-process"
+                policy4=flow_callout_template(
+                    policy4_name,
+                    override_sf_post
+                )
                 api1.inject_policy(
                     proxy_path,
                     policy4_name,
