@@ -108,4 +108,4 @@ jobs:
 
       - name: Run tree
         run: |
-          gcloud storage -n cp *.zip ${{ secrets.APIGEEE_STATE_GCS_BUCKET }}/apis | echo "Okay empty"
+          gcloud storage cp *.zip ${{ secrets.APIGEEE_STATE_GCS_BUCKET }}/apis | echo "Okay empty"
