@@ -141,7 +141,7 @@ data "google_client_config" "default" {
 
 resource "null_resource" "prepare_apigee_bundle" {
   triggers = {
-    # timestamp         = timestamp()
+    timestamp         = timestamp()
     apigee_org        = var.apigee_org
     api_name          = var.apigee_proxy_name
     api_base_path     = var.apigee_proxy_basepath
