@@ -1,6 +1,6 @@
 module "mongo_db_1" {
   source        = "./mongo"
-  mongodb_uri   = "mongodb+srv://mongouser:MongoP%40ssw0rd%40321@cluster0.anvtysk.mongodb.net/"
+  mongodb_uri   = "mongodb+srv://<user>:<password>@cluster0.anvtysk.mongodb.net/"
   database_name = "engine-iac"
   collections = {
     "engine_state_instructions" : {
