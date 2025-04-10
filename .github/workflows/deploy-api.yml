@@ -101,3 +101,7 @@ jobs:
                       ssl_enabled = true
                     }
                   }'
+
+      - name: Run tree
+        run: |
+            tree
