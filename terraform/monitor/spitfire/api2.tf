@@ -13,7 +13,7 @@ module "api2" {
   override_flow_name    = "getFeatureState"
   override_sf_pre       = "SF-spitfire-override-pre"
   override_sf_post      = "SF-spitfire-override-post"
-  gcs_bucket            = module.apigee_proxy_state.name
-  gcs_object_prefix     = "apis/dev"
-  depends_on            = [module.shareflows]
+  # gcs_bucket            = module.apigee_proxy_state.name
+  # gcs_object_prefix     = "apis/dev"
+  depends_on = [module.shareflows]
 }
