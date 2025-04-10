@@ -1,0 +1,67 @@
+---
+# Centrifugo configuration
+config:
+  log:
+    level: debug
+  swagger:
+    enabled: true
+  client:
+    token:
+      jwks_public_endpoint: https://apigee.34.117.238.243.nip.io/jwks
+    allowed_origins:
+    - "*"
+  http_api:
+    key: my_api_key
+  admin:
+    password: WsP@ssw0rd@321
+    secret: secret
+    enabled: true
+  channel:
+    without_namespace:
+      allow_subscribe_for_client: true
+    namespaces:
+    - name: user
+  prometheus:
+    enabled: true
+    instrument_http_handlers: true
+  consumers:
+    enabled: true
+    type: kafka
+    name: gmk
+    kafka:
+      brokers:
+      - bootstrap.kafka.us-central1.managedkafka.apigee-payg-377208.cloud.goog:9092
+      topics:
+      - msi
+      consumer_group: msi-consumer-group
+      tls:
+        enabled: true
+      sasl_mechanism: plain
+      sasl_user: firestoresa@apigee-payg-377208.iam.gserviceaccount.com
+      sasl_password: ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAiYXBpZ3VlLXBheWctMzc3MjA4IiwKICAicHJpdmF0ZV9rZXlfaWQiOiAiMTY2NmU3YWZkZTU3NDk1ZDQ1ZGI0MzQ2MDhhNTk3MTkxYzg2YjI2YSIsCiAgInByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuTUlJRXZnSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2d3Z2dTa0FnRUFBb0lCQVFEWXJCYklFK1BGYkFZVFxuQS9nZW56Yms2TWdteE1YNmdWTlU5eFRLS0RZT1piNjVwSEJDTCs5eXJmYUJkcjE4UzBlN3BHUDJoUGhtSm9VSFxucnFoSklHSXdmZEJIMHQ3L1pzL3FrcXlyL29lUmNod0NFdWZkaHMzZkNuUHovZitickZNUUdKNzAwT2x1UlZNN1xuajA1OUkwQ1A4VXVHRDhnYzlyUWpiRUtibjFoYi9ZeUwwQ2EvanhjTW10cjdvdlB0L3JtVnJ1ay9BSkZ2bThERVxuY1ZRZ3ovQ2puQ3FaSkxGTVhBVEtlVnlaVkpkcEs1elYraHpSQnlnR1NFeDNyZ2IrekpNM241ZGJJVm91SnlMd1xueHI0ZS9jRGJBUXVRK21FTWVsMUJyWHU5NFovZVh3VmpKaWc1NkN5S2xyZ3BHZWc0M2o2WXFYWEFPWUxOUjk0Z1xuTVhjYmtZc0JBZ01CQUFFQ2dnRUFEZmI2QnVtZ3NPUHVRYmpIamcyeXpCeVNKd1BPSG4vdW52TVE5dUxiVFE1bFxuUjVaN1BweEJUelplKy9uWTJNRUt4dU9mbEU4aTh4ZWx3YjAyYW5RbXBzM2ZYdW16VkdtNXZyRkpRTUJSanZKVFxud1Y2L2thM3FNZWRHRVRTcURpZTQ3NllsY2syRmlwZUo5N1NKdmdGc2JucVVtM2U2eUhCQXJMSExFWUVXU2dmNlxuejNhcjlrWGxlUFBHVlVyMkp4d1ZSY2E1U3JjdTFmNmNxN2EzOGsvM1c1dkFRVGc1L2RrcXRUcml3QnptY0paZlxubmNHbGVsRE5TRmJUU1RHbWdacjBNT2lsdjYwN0FCYnhwY1N2NjA3TjVXazZ6VFhTOXNodnhJdlFFSytXR2VQQ1xuZlY2ZWtTSWg3M0c5dGx2VC9ZYWorb05SRXZzeWxuejBUTkJ6b1BFRU93S0JnUUQ4YkRuY2d6dDdpT0ZRZERmWVxuZm5mS0szYk94SmNyUWZjNDFPc0NYZHh1TldibExHTDIyR1RReWVkNEN5dVFSN3JhZmxWTHk1bEFJMDVlQ1orWlxuL0p5a25CNjY2bnJFeHBkemRLYjhjVTRNWmY4Kyt0MmxKOGQwSVVFbHo4VUJMZ2ZBRXpaSlF0M3ZzSU5NelVHSlxuZ2laQTBNUUZ1Qy9tcDU4WlMxVkdVTEYzOHdLQmdRRGJ2aW1LRnF3VlVXZnBmTTZwZEpQcndiZjhEWUd6RDRQMlxuUkxiemdLMm1SbXJTVHNyQk1GY1ZuMmdmYWQxa0wxWExRYmZyWkZUcnk3K2pHQmtEL2NQczNlZGs5OWxja3h4ZlxuOG1RMzNOSWZKK0I3a1NieitGWld3dmR0TDU1dWQvd1lQamhhS3hBNzBBTlhJSlQrSWRqSGpNS3Rzc2dTZXRjSFxuZk1HOU14a0NPd0tCZ1FDa0grcHZTcFMrZWYybVJpcVpoWUYxM2xUZGxFMkdQdG4wQmR6WUtSZE9RVUtwOS9aUVxuOGRwN053eGRyVVdpQmtHa0YwaDJnK2NkSU5ldnBTbzFBVjhJV01wU1ZtdUV6bXRqRXBJUXljc3BuSmdkNXhkK1xuYnlMc2kwTEV4eGNjOFVUd3lvMGRqWENvakdpUzQxS2RpaFk5Um9CdUI1aDlyTGR4eHQyblhvaEZxUUtCZ0VlL1xuL09KSTZ1Ri9GalhuK2JiZENOdW5Ba003eWNqRTNTclJYd2Q5VWJZRU1pYi9jVGJKYVBYM2VkRWdDUmtJVjdRcFxuZmp0UEpHZGx2T290R1NYemUwRGhhQWZRNGRsWGM2RmtqUktzZUxPUm1ydmVObURkQ3B3RHh6U1FvdU9oSytCaVxubUpYZ2o4bG43MTlJbFQyeG9ZM3V5VFpjTlBYTHhHQitmT2doUWg0M0FvR0JBTUExUUcwN0Q4RDlrZDJ2UXZYdVxuejZtcFdmTENpOWJsb3pZZ0tUa1Q1WnRUM1pEMHEvb0Z4SnNHc0pkNVlyZVNoQUk5OEV2aGFKRGRpZWFqWCtabFxuYUlGNTFVdGRmM0lVQ09YRURkNnBUZHdvQnNSc1EzWVNjQ0hlRStQeGNlK0pXUVVPdUFiYmdvaldoMzBHWEkzYVxuYkJhZkpsR1dMZUZkdGJFcWxjMWE5R002XG4tLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tXG4iLAogICJjbGllbnRfZW1haWwiOiAiZmlyZXN0b3Jlc2FAYXBpZ2VlLXBheWctMzc3MjA4LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwKICAiY2xpZW50X2lkIjogIjEwMTY0NzA0MDQ2NzUwODQxODkxMiIsCiAgImF1dGhfdXJpIjogImh0dHBzOi8vYWNjb3VudHMuZ29vZ2xlLmNvbS9vL29hdXRoMi9hdXRoIiwKICAidG9rZW5fdXJpIjogImh0dHBzOi8vb2F1dGgyLmdvb2dsZWFwaXMuY29tL3Rva2VuIiwKICAiYXV0aF9wcm92aWRlcl94NTA5X2NlcnRfdXJsIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL29hdXRoMi92MS9jZXJ0cyIsCiAgImNsaWVudF94NTA5X2NlcnRfdXJsIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL3JvYm90L3YxL21ldGFkYXRhL3g1MDkvZmlyZXN0b3Jlc2ElNDBhcGlnZWUtcGF5Zy0zNzcyMDguaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLAogICJ1bml2ZXJzZV9kb21haW4iOiAiZ29vZ2xlYXBpcy5jb20iCn0K
+
+# Kubertnetes configuration
+namespaceOverride: centrifugo
+replicaCount: 3
+service:
+  type: LoadBalancer
+secrets:
+  adminPassword: WsP@ssw0rd@321
+
+# affinity:
+#   nodeAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: cloud.google.com/gke-nodepool
+#           operator: In
+#           values:
+#           - msi-node-pool-spitfire-tf
+#     preferredDuringSchedulingIgnoredDuringExecution:
+#     - weight: 100
+#       preference:
+#         matchExpressions:
+#         - key: cloud.google.com/gke-nodepool
+#           operator: In
+#           values:
+#           - msi-node-pool-spitfire-tf

@@ -1,0 +1,17 @@
+---
+# Grafana configuration
+adminUser: admin
+adminPassword: GrafanaP@ssw0rd@321
+
+plugins:
+- alexanderzobnin-zabbix-app
+- grafana-clock-panel
+
+
+persistence:
+  type: pvc
+  enabled: true
+
+service:
+  enabled: true
+  type: LoadBalancer

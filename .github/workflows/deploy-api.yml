@@ -10,6 +10,10 @@ env:
   APIGEE_ENV: dev
   TF_HTTP_PASSWORD: ${{ secrets.GH_PAT_TOKEN }}
 
+defaults:
+  run:
+    working-directory: ./terraform/monitor/spitfire
+
 jobs:
   deploy-oas:
     runs-on: ubuntu-latest

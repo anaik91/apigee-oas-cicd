@@ -1,0 +1,64 @@
+openapi: 3.0.1
+info:
+  title: feature-flag-manager APIs
+  version: "${app.version}"
+servers:
+- description: Generated server url
+  url: http://localhost
+paths:
+  /features/{key}:
+    get:
+      operationId: getFeatureState
+      parameters:
+      - in: path
+        name: key
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FeatureFlagResponseDTO"
+          description: The current state of the feature flag has been returned
+        "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDTO"
+          description: |-
+            _errorCode_ values:
+            * 101 - the feature flag was not found
+      summary: "Obtaining Feature flag current state, filtered by customerId"
+      tags:
+      - public
+      - Feature Flags
+components:
+  schemas:
+    ErrorMessageDTO:
+      type: object
+      properties:
+        documentation:
+          type: string
+        errorCode:
+          type: integer
+          format: int32
+        errorDetails:
+          type: array
+          items:
+            type: string
+        errorMessage:
+          type: string
+    FeatureFlagResponseDTO:
+      type: object
+      properties:
+        featureFlagState:
+          $ref: "#/components/schemas/FeatureFlagState"
+    FeatureFlagState:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        name:
+          type: string

@@ -1,0 +1,14 @@
+annotations:
+  networking.gke.io/load-balancer-type: "Internal"
+  cloud.google.com/neg: '{"exposed_ports": {"443":{"name": "spitfire-neg-443"},"15021":{"name": "spitfire-neg-15021"}}}'
+name: istio-ingressgateway
+labels:
+  app: ""
+  istio: ingressgateway
+autoscaling:
+ enabled: true
+ minReplicas: 1
+ maxReplicas: 2
+ targetCPUUtilizationPercentage: 80
+podDisruptionBudget:
+ maxUnavailable: 1

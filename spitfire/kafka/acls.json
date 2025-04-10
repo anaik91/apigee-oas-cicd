@@ -1,0 +1,78 @@
+[
+    {
+      "action": "CREATE",
+      "description": "Allow testuser1 to READ topic 'orders-topic'",
+      "resource_type": "TOPIC",
+      "resource_name": "orders-topic",
+      "resource_pattern_type": "LITERAL",
+      "principal": "User:testuser1",
+      "host": "*",
+      "operation": "READ",
+      "permission_type": "ALLOW"
+    },
+    {
+      "action": "CREATE",
+      "description": "Allow testuser1 to READ group 'order-consumers'",
+      "resource_type": "GROUP",
+      "resource_name": "order-consumers",
+      "resource_pattern_type": "LITERAL",
+      "principal": "User:testuser1",
+      "host": "*",
+      "operation": "READ",
+      "permission_type": "ALLOW"
+    },
+      {
+      "action": "CREATE",
+      "description": "Allow testadmin to DESCRIBE any topic",
+      "resource_type": "TOPIC",
+      "resource_name": "*",
+      "resource_pattern_type": "LITERAL",
+      "principal": "User:testadmin",
+      "host": "*",
+      "operation": "DESCRIBE",
+      "permission_type": "ALLOW"
+    },
+    {
+      "action": "DESCRIBE",
+      "description": "List all ACLs for testuser1",
+      "principal": "User:testuser1",
+      "resource_type": "ANY", 
+      "resource_name": null,
+      "resource_pattern_type": "ANY",
+      "host": null,
+      "operation": "ANY",
+      "permission_type": "ANY"
+    },
+      {
+      "action": "DESCRIBE",
+      "description": "List specific READ ACLs for testuser1 on orders-topic",
+      "resource_type": "TOPIC",
+      "resource_name": "orders-topic",
+      "resource_pattern_type": "LITERAL",
+      "principal": "User:testuser1",
+      "operation": "READ",
+      "permission_type": "ALLOW"
+    },
+    {
+      "action": "DELETE",
+      "description": "Remove READ access for testuser1 from 'orders-topic'",
+      "resource_type": "TOPIC",
+      "resource_name": "orders-topic",
+      "resource_pattern_type": "LITERAL",
+      "principal": "User:testuser1",
+      "host": "*",
+      "operation": "READ",
+      "permission_type": "ALLOW"
+    },
+    {
+      "action": "DELETE",
+      "description": "Remove ALL ACLs for User:cleanupuser on group 'old-group'",
+      "resource_type": "GROUP",
+      "resource_name": "old-group",
+      "resource_pattern_type": "LITERAL",
+      "principal": "User:cleanupuser",
+      "host": "*",
+      "operation": "ANY",
+      "permission_type": "ANY"
+    }
+  ]

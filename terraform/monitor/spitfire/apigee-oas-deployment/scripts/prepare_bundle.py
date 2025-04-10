@@ -9,6 +9,8 @@ import shutil
 import requests
 import json
 import xmltodict
+from google.cloud import storage # <-- Add this import
+from google.cloud.exceptions import NotFound # <-- Optional, for specific error handling
 
 # Configure logging
 logging.basicConfig(
@@ -34,11 +36,12 @@ class ApigeeCliRunner:
             oas_base_folderpath=".",
             oas_name="httpbin.yaml",
             org="test-org",
+            target_url="http://localhost:8080",
             default_token=True,  # Boolean parameter
             import_api=False,    # Boolean parameter, renamed to avoid clash with import keyword
             validate=True,      # Boolean parameter
             skip_policy=True,     # Boolean parameter
-    ):
+            ):
         """
         Initializes the ApigeeCliRunner with the specified parameters.
 
@@ -60,6 +63,7 @@ class ApigeeCliRunner:
         self.oas_base_folderpath = oas_base_folderpath
         self.oas_name = oas_name
         self.org = org
+        self.target_url = target_url
         self.default_token = default_token
         self.import_api = import_api
         self.validate = validate
@@ -85,6 +89,7 @@ class ApigeeCliRunner:
             "--oas-base-folderpath", self.oas_base_folderpath,
             "--oas-name", self.oas_name,
             "--org", self.org,
+            "--target-url", self.target_url,
         ]
 
         # Add boolean arguments conditionally
@@ -269,7 +274,10 @@ class ApigeeCliRunner:
                 flow_names.remove("PostFlow")
 
             # Locate the desired flows and insert the shared flow callout
-            for flow in proxy_dict['ProxyEndpoint']['Flows']['Flow']:
+            flows = proxy_dict.get('ProxyEndpoint', {}).get('Flows', {}).get('Flow', [])
+            if isinstance(flows, dict):
+                flows = [flows]
+            for flow in flows:
                 if flow['@name'] in flow_names:
                     # Insert the SharedFlowCallout at the beginning of the specified flow chain
                     if flow_type not in flow or flow[flow_type] is None:
@@ -326,7 +334,10 @@ class ApigeeCliRunner:
             proxy_dict = xmltodict.parse(xml_content)
 
             # Extract flow names from the Flows section
-            for flow in proxy_dict['ProxyEndpoint']['Flows']['Flow']:
+            flows = proxy_dict.get('ProxyEndpoint', {}).get('Flows', {}).get('Flow', [])
+            if isinstance(flows, dict):
+                flows = [flows]
+            for flow in flows:
                 flow_names.append(flow['@name'])
 
             logging.info(f" Successfully retrieved flow names from: {proxy_xml_path} ")
@@ -387,6 +398,219 @@ class ApigeeCliRunner:
         except Exception as e:
             logging.exception(" An error occurred during proxy validation ")
             return None
+    
+    def deploy_proxy(self, proxy_name, env_name, revision):
+        """
+        Deploys the API proxy revision by calling the Apigee API.
+
+        Args:
+            proxy_name (str): The name of the API proxy.
+            env_name (str): The apigee env name to deploy API proxy.
+            revision (str): The revision of the API proxy to deploy.
+
+        Returns:
+            dict: The JSON response from the Apigee API, or None if validation failed.
+        """
+        if not self.access_token:
+          self.access_token = self.get_access_token() # Get the access token
+
+        if not self.access_token:
+            logging.error(" Access token is missing.  Cannot validate proxy. ")
+            return None
+
+        api_url = f"https://apigee.googleapis.com/v1/organizations/{self.org}/environments/{env_name}/apis/{proxy_name}/revisions/{revision}/deployments?override=true"
+
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            response = requests.post(api_url, headers=headers)
+            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+
+            response_json = response.json()
+            logging.info(" Proxy deploy successful ")
+            logging.debug(f"deploy response: {json.dumps(response_json, indent=2)}") # Log with indent for readability
+            return response_json
+
+        except requests.exceptions.HTTPError as e:
+            logging.error(" Proxy deploy failed (HTTP Error) ")
+            logging.error(f"Status code: {e.response.status_code}")
+            try:
+              logging.error(f"Response body: {json.dumps(e.response.json(), indent=2)}") # Attempt to log the response body as JSON
+            except json.JSONDecodeError:
+              logging.error(f"Response body: {e.response.text}") # If JSON decode fails, log as text.
+            return None
+        except Exception as e:
+            logging.exception(" An error occurred during proxy deployment ")
+            return None
+
+    def undeploy_proxy(self, proxy_name, env_name, revision):
+        """
+        Validates the API proxy ZIP file by calling the Apigee API.
+
+        Args:
+            proxy_name (str): The name of the API proxy.
+            env_name (str): The apigee env name to deploy API proxy.
+            revision (str): The revision of the API proxy to deploy.
+
+        Returns:
+            dict: The JSON response from the Apigee API, or None if validation failed.
+        """
+        if not self.access_token:
+          self.access_token = self.get_access_token() # Get the access token
+
+        if not self.access_token:
+            logging.error(" Access token is missing.  Cannot validate proxy. ")
+            return None
+
+        api_url = f"https://apigee.googleapis.com/v1/organizations/{self.org}/environments/{env_name}/apis/{proxy_name}/revisions/{revision}/deployments"
+
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            response = requests.delete(api_url, headers=headers)
+            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+
+            response_json = response.json()
+            logging.info(" Proxy undeploy successful ")
+            logging.debug(f"undeploy response: {json.dumps(response_json, indent=2)}") # Log with indent for readability
+            return response_json
+
+        except requests.exceptions.HTTPError as e:
+            logging.error(" Proxy undeploy failed (HTTP Error) ")
+            logging.error(f"Status code: {e.response.status_code}")
+            try:
+              logging.error(f"Response body: {json.dumps(e.response.json(), indent=2)}") # Attempt to log the response body as JSON
+            except json.JSONDecodeError:
+              logging.error(f"Response body: {e.response.text}") # If JSON decode fails, log as text.
+            return None
+        except Exception as e:
+            logging.exception(" An error occurred during proxy undeployment ")
+            return None
+    
+    def upload_to_gcs(self, local_zip_path, bucket_name, gcs_destination_path):
+        """
+        Uploads the specified local ZIP file (API proxy bundle) to Google Cloud Storage.
+
+        Relies on Application Default Credentials (ADC) for authentication.
+        Ensure your environment is authenticated (e.g., `gcloud auth application-default login`
+        or running in a GCP environment with appropriate service account permissions).
+
+        Args:
+            local_zip_path (str): The path to the local ZIP file to upload.
+            bucket_name (str): The name of the target GCS bucket.
+            gcs_destination_path (str): The desired path (object name) for the file
+                                         within the GCS bucket (e.g., 'proxies/my-proxy-v1.zip').
+
+        Returns:
+            bool: True if the upload was successful, False otherwise.
+        """
+        try:
+            # Instantiates a client. Handles authentication via ADC.
+            storage_client = storage.Client()
+
+            # Get the target bucket
+            try:
+                bucket = storage_client.get_bucket(bucket_name)
+            except NotFound:
+                logging.error(f" Error: GCS bucket '{bucket_name}' not found. ")
+                return False
+
+            # Create a blob object representing the destination path
+            blob = bucket.blob(gcs_destination_path)
+
+            # Upload the local file
+            logging.info(f" Uploading '{local_zip_path}' to 'gs://{bucket_name}/{gcs_destination_path}'... ")
+            blob.upload_from_filename(local_zip_path)
+
+            logging.info(f" Successfully uploaded bundle to gs://{bucket_name}/{gcs_destination_path} ")
+            return True
+
+        except FileNotFoundError:
+            logging.error(f" Error: Local file not found at '{local_zip_path}' ")
+            return False
+        except Exception as e:
+            # Catching other potential exceptions from the google-cloud-storage library
+            # or other unexpected issues.
+            logging.exception(f" An error occurred while uploading to GCS: {e} ")
+            return False
+    
+    def download_from_gcs(self, bucket_name, gcs_source_path, local_destination_path):
+        """
+        Downloads an object (e.g., an API proxy bundle ZIP) from Google Cloud Storage
+        to a local file path.
+
+        Relies on Application Default Credentials (ADC) for authentication.
+        Ensure your environment is authenticated (e.g., `gcloud auth application-default login`
+        or running in a GCP environment with appropriate service account permissions).
+
+        Args:
+            bucket_name (str): The name of the source GCS bucket.
+            gcs_source_path (str): The path (object name) of the file within the GCS bucket
+                                   to download (e.g., 'proxies/my-proxy-v1.zip').
+            local_destination_path (str): The full path on the local filesystem where
+                                          the downloaded file should be saved. Parent
+                                          directories will be created if they don't exist.
+
+        Returns:
+            bool: True if the download was successful, False otherwise.
+        """
+        try:
+            # Instantiates a client. Handles authentication via ADC.
+            storage_client = storage.Client()
+
+            # Get the source bucket
+            try:
+                bucket = storage_client.get_bucket(bucket_name)
+            except NotFound:
+                logging.error(f" Error: GCS bucket '{bucket_name}' not found. ")
+                return False
+            except Exception as e: # Catch other potential client/bucket errors
+                 logging.exception(f" Error accessing GCS bucket '{bucket_name}': {e} ")
+                 return False
+
+            # Get the blob (object) to download
+            blob = bucket.blob(gcs_source_path)
+
+            # Check if the blob exists before attempting download
+            if not blob.exists():
+                logging.error(f" Error: Object '{gcs_source_path}' not found in bucket '{bucket_name}'. ")
+                return False
+
+            # Create local directories if they don't exist
+            local_dir = os.path.dirname(local_destination_path)
+            if local_dir: # Ensure local_dir is not empty (e.g., if dest is just a filename)
+                os.makedirs(local_dir, exist_ok=True)
+
+            # Download the blob to the specified local path
+            logging.info(f" Downloading 'gs://{bucket_name}/{gcs_source_path}' to '{local_destination_path}'... ")
+            blob.download_to_filename(local_destination_path, timeout=120) # Add a timeout
+
+            logging.info(f" Successfully downloaded file to {local_destination_path} ")
+            return True
+
+        except NotFound:
+             # This might be redundant if blob.exists() check is robust, but good failsafe
+             logging.error(f" Error: GCS object not found during download: gs://{bucket_name}/{gcs_source_path} ")
+             return False
+        except Exception as e:
+            # Catching other potential exceptions from the google-cloud-storage library
+            # (e.g., permissions, network issues) or local filesystem errors.
+            logging.exception(f" An error occurred while downloading from GCS: {e} ")
+            # Clean up potentially partially downloaded file
+            if os.path.exists(local_destination_path):
+                 try:
+                     os.remove(local_destination_path)
+                     logging.info(f" Removed potentially incomplete file: {local_destination_path}")
+                 except OSError as rm_err:
+                     logging.error(f" Error removing incomplete file {local_destination_path}: {rm_err}")
+            return False
+
 
 def flow_callout_template(fc_name, sf_name) -> str:
     return f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -403,6 +627,7 @@ def main():
     parser.add_argument("--apigee_org", required=True, help="Apigee organization")
     parser.add_argument("--api_name", required=True, help="API proxy name")
     parser.add_argument("--api_base_path", required=True, help="API base path")
+    parser.add_argument("--target_url", required=True, help="OAS Target URL")
     parser.add_argument("--oas_file_location", required=True, help="OAS file location")
     parser.add_argument("--oas_file_name", required=True, help="OAS file name")
     parser.add_argument("--override_flow_names", default="", help="Comma separated list of flow operations to override")
@@ -410,9 +635,26 @@ def main():
     parser.add_argument("--base_sf_post",required=True, help="Response Shared flow to override with")
     parser.add_argument("--override_sf_pre",default="", help="Request Shared flow to override with")
     parser.add_argument("--override_sf_post",default="", help="Response Shared flow to override with")
+    parser.add_argument('--enable_gcs_persistence', action='store_true', dest='use_gcs',
+                    default=False,
+                    help='Explicitly enable GCS persistence (default: disabled)')
+    parser.add_argument('--gcs_pull', action='store_true', dest='gcs_pull',
+                    default=False,
+                    help='Explicitly enable GCS persistence (default: disabled)')
+    parser.add_argument("--gcs_bucket",default="", help="Response Shared flow to override with")
+    parser.add_argument("--gcs_object_prefix",default="", help="Response Shared flow to override with")
+    parser.add_argument('--undeploy_revision', action='store_true', dest='undeploy_revision',
+                    default=False,
+                    help='Explicitly enable GCS persistence (default: disabled)')
+    parser.add_argument('--deploy_revision', action='store_true', dest='deploy_revision',
+                    default=False,
+                    help='Explicitly enable GCS persistence (default: disabled)')
+    parser.add_argument("--apigee_env", help="Apigee Env Name")
+    parser.add_argument("--api_revision", help="Apigee Proxy Revision")
 
     args = parser.parse_args()
     apigee_org = args.apigee_org
+    target_url = args.target_url
     api_name = args.api_name
     api_base_path = args.api_base_path
     oas_file_location= args.oas_file_location
@@ -434,11 +676,48 @@ def main():
         oas_base_folderpath=oas_file_location,
         oas_name=oas_file_name,
         org=apigee_org,
+        target_url=target_url,
         default_token=False,
         import_api=False, # Set to False,
         validate=True,
         skip_policy=True,
     )
+
+    if args.gcs_pull:
+        if api1.download_from_gcs(
+            args.gcs_bucket,
+            f"{args.gcs_object_prefix}/{api_name}.zip",
+            f"{api_name}.zip"
+        ):
+            logging.info(f"Bundle {api_name}.zip fetched from GCS.")
+        else:
+            logging.error(f"Bundle {api_name}.zip fetch from GCS failed.")
+            sys.exit(1)
+        return
+
+    if args.deploy_revision:
+        if api1.deploy_proxy(
+            api_name,
+            args.apigee_env,
+            args.api_revision
+        ) is not None:
+            logging.info(f"Proxy {api_name} with revison {args.api_revision} has been deployed")
+        else:
+            logging.error(f"Deploy of proxy {api_name} with revison {args.api_revision} failed")
+            sys.exit(1)
+        return
+
+    if args.undeploy_revision:
+        if api1.undeploy_proxy(
+            api_name,
+            args.apigee_env,
+            args.api_revision
+        ) is not None:
+            logging.info(f"Proxy {api_name} with revison {args.api_revision} has been undeployed")
+        else:
+            logging.error(f"Undeploy of proxy {api_name} with revison {args.api_revision} failed")
+            sys.exit(1)
+        return
 
     if api1.create_bundle():
         bundle_path = f"./{api_name}.zip"
@@ -547,15 +826,22 @@ def main():
                 f"{api_name}.zip"
             )
 
-            api1.validate_proxy(api_name, f"{api_name}.zip")
+            if api1.validate_proxy(api_name, f"{api_name}.zip") is not None:
+                logging.info("Bundle validated successful.")
+                if args.use_gcs:
+                    logging.info("Uploading bundle to GCS.")
+                    if api1.upload_to_gcs(f"{api_name}.zip",
+                                       args.gcs_bucket,
+                                       f"{args.gcs_object_prefix}/{api_name}.zip"):
+                        logging.info("Bundle uploaded to GCS.")
+                    else:
+                        logging.error("Bundle upload to GCS failed.")
         else:
             logging.error("Bundle creation failed, cannot unzip.")
             sys.exit(1)
     else:
         logging.error("Bundle creation failed.")
         sys.exit(1)
-        
-
 
 if __name__ == "__main__":
     main()

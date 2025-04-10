@@ -28,10 +28,10 @@ if __name__ == "__main__":
     # Example Usage
     payload = {
         'iss': 'ExchangeTokens',
-        'sub': 'user123',
+        'sub': 'john.doe',
         'aud': 'your-audience',
         'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=60),
+        'exp': datetime.utcnow() + timedelta(minutes=3600),
         'name': 'John Doe',
         'email': 'john.doe@example.com',
         'orgId': 'example'
