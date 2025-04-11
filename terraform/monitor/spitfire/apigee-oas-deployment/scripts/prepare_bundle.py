@@ -9,8 +9,8 @@ import shutil
 import requests
 import json
 import xmltodict
-from google.cloud import storage # <-- Add this import
-from google.cloud.exceptions import NotFound # <-- Optional, for specific error handling
+from google.cloud import storage
+from google.cloud.exceptions import NotFound
 
 # Configure logging
 logging.basicConfig(
@@ -31,6 +31,7 @@ class ApigeeCliRunner:
 
     def __init__(
             self,
+            access_token,
             basepath="/testoas",
             name="testoas",
             oas_base_folderpath=".",
@@ -68,7 +69,7 @@ class ApigeeCliRunner:
         self.import_api = import_api
         self.validate = validate
         self.skip_policy = skip_policy
-        self.access_token = None
+        self.access_token = access_token
 
 
     def create_bundle(self):
@@ -217,30 +218,6 @@ class ApigeeCliRunner:
             logging.exception(f" An error occurred while zipping the bundle ")
             return None
 
-    def get_access_token(self):
-        """Retrieves an access token using gcloud auth print-access-token."""
-        try:
-            result = subprocess.run(
-                ["gcloud", "auth", "print-access-token"],
-                check=True,
-                capture_output=True,
-                text=True
-            )
-            self.access_token = result.stdout.strip()
-            logging.info(" Successfully retrieved access token ")
-            return self.access_token
-        except subprocess.CalledProcessError as e:
-            logging.error(" Failed to retrieve access token using gcloud ")
-            logging.error(f"STDOUT: {e.stdout}")
-            logging.error(f"STDERR: {e.stderr}")
-            return None
-        except FileNotFoundError:
-            logging.error(" gcloud command not found. Ensure Google Cloud SDK is installed and in your PATH. ")
-            return None
-        except Exception as e:
-            logging.exception(" An unexpected error occurred while retrieving access token ")
-            return None
-
     def inject_shared_flow_to_flows(self, bundle_dir, shared_flow_name, flow_names, flow_type="Request"):
         """
         Parses apiproxy/proxies/default.xml, injects a shared flow callout into specified flows.
@@ -360,8 +337,6 @@ class ApigeeCliRunner:
         Returns:
             dict: The JSON response from the Apigee API, or None if validation failed.
         """
-        if not self.access_token:
-          self.access_token = self.get_access_token() # Get the access token
 
         if not self.access_token:
             logging.error(" Access token is missing.  Cannot validate proxy. ")
@@ -398,7 +373,7 @@ class ApigeeCliRunner:
         except Exception as e:
             logging.exception(" An error occurred during proxy validation ")
             return None
-    
+
     def deploy_proxy(self, proxy_name, env_name, revision):
         """
         Deploys the API proxy revision by calling the Apigee API.
@@ -411,8 +386,6 @@ class ApigeeCliRunner:
         Returns:
             dict: The JSON response from the Apigee API, or None if validation failed.
         """
-        if not self.access_token:
-          self.access_token = self.get_access_token() # Get the access token
 
         if not self.access_token:
             logging.error(" Access token is missing.  Cannot validate proxy. ")
@@ -458,8 +431,6 @@ class ApigeeCliRunner:
         Returns:
             dict: The JSON response from the Apigee API, or None if validation failed.
         """
-        if not self.access_token:
-          self.access_token = self.get_access_token() # Get the access token
 
         if not self.access_token:
             logging.error(" Access token is missing.  Cannot validate proxy. ")
@@ -492,7 +463,7 @@ class ApigeeCliRunner:
         except Exception as e:
             logging.exception(" An error occurred during proxy undeployment ")
             return None
-    
+
     def upload_to_gcs(self, local_zip_path, bucket_name, gcs_destination_path):
         """
         Uploads the specified local ZIP file (API proxy bundle) to Google Cloud Storage.
@@ -539,7 +510,7 @@ class ApigeeCliRunner:
             # or other unexpected issues.
             logging.exception(f" An error occurred while uploading to GCS: {e} ")
             return False
-    
+
     def download_from_gcs(self, bucket_name, gcs_source_path, local_destination_path):
         """
         Downloads an object (e.g., an API proxy bundle ZIP) from Google Cloud Storage
@@ -625,6 +596,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Create and modify Apigee API proxies.")
     parser.add_argument("--apigee_org", required=True, help="Apigee organization")
+    parser.add_argument("--access_token", required=True, help="GCP access token")
     parser.add_argument("--api_name", required=True, help="API proxy name")
     parser.add_argument("--api_base_path", required=True, help="API base path")
     parser.add_argument("--target_url", required=True, help="OAS Target URL")
@@ -671,6 +643,7 @@ def main():
     override_sf_post = args.override_sf_post
 
     api1 = ApigeeCliRunner(
+        args.access_token,
         basepath=api_base_path,
         name=api_name,
         oas_base_folderpath=oas_file_location,

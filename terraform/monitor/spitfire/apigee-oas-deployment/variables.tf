@@ -79,13 +79,3 @@ variable "override_sf_post" {
   type    = string
   default = ""
 }
-
-# variable "gcs_bucket" {
-#   type        = string
-#   description = "Bucket to store API Proxy Bundles"
-# }
-
-# variable "gcs_object_prefix" {
-#   type        = string
-#   description = "Object Prefix to store API Proxy Bundles"
-# }
